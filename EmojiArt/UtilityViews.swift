@@ -13,8 +13,6 @@ struct OptionalImage: View {
     var body: some View {
         if uiImage != nil {
             Image(uiImage: uiImage!)
-                .resizable()
-                .scaledToFit()
         }
     }
 
