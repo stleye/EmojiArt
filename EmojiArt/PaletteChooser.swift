@@ -23,6 +23,37 @@ struct PaletteChooser: View {
         .clipped()
     }
     
+    @ViewBuilder
+    var contextMenu: some View {
+        AnimatedActionButton(title: "Edit", systemImage: "pencil") {
+            //editing = true
+            paletteToEdit = store.palette(at: chosePaletteIndex)
+        }
+        AnimatedActionButton(title: "New", systemImage: "plus") {
+            store.insertPalette(named: "New", emojis: "", at: chosePaletteIndex)
+            //editing = true
+            paletteToEdit = store.palette(at: chosePaletteIndex)
+        }
+        AnimatedActionButton(title: "Delete", systemImage: "minus.circle") {
+            chosePaletteIndex = store.removePalette(at: chosePaletteIndex)
+        }
+        gotoMenu
+    }
+    
+    var gotoMenu: some View {
+        Menu {
+            ForEach (store.palettes) { palette in
+                AnimatedActionButton(title: palette.name) {
+                    if let index = store.palettes.index(matching: palette) {
+                        chosePaletteIndex = index
+                    }
+                }
+            }
+        } label: {
+            Label("Go To", systemImage: "text.insert")
+        }
+    }
+    
     var paletteControlButton: some View {
         Button {
             withAnimation {
@@ -32,6 +63,9 @@ struct PaletteChooser: View {
             Image(systemName: "paintpalette")
         }
         .font(emojiFont)
+        .contextMenu {
+            contextMenu
+        }
     }
 
     func body(for palette: Palette) -> some View {
@@ -42,7 +76,17 @@ struct PaletteChooser: View {
         }
         .id(palette.id)
         .transition(rollTransition)
+//        .popover(isPresented: $editing) {
+//            PaletteEditor(palette: $store.palettes[chosePaletteIndex])
+//        }
+        .popover(item: $paletteToEdit) { palette in
+            PaletteEditor(palette: $store.palettes[palette])
+        }
     }
+    
+    //@State private var editing = false
+    @State private var paletteToEdit: Palette?
+    
 
     var rollTransition: AnyTransition {
         AnyTransition.asymmetric(
