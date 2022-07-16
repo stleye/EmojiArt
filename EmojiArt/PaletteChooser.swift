@@ -37,6 +37,9 @@ struct PaletteChooser: View {
         AnimatedActionButton(title: "Delete", systemImage: "minus.circle") {
             chosePaletteIndex = store.removePalette(at: chosePaletteIndex)
         }
+        AnimatedActionButton(title: "Manager", systemImage: "slider.vertical.3") {
+            managing = true
+        }
         gotoMenu
     }
     
@@ -82,11 +85,14 @@ struct PaletteChooser: View {
         .popover(item: $paletteToEdit) { palette in
             PaletteEditor(palette: $store.palettes[palette])
         }
+        .sheet(isPresented: $managing) {
+            PaletteManager()
+        }
     }
     
     //@State private var editing = false
     @State private var paletteToEdit: Palette?
-    
+    @State private var managing = false
 
     var rollTransition: AnyTransition {
         AnyTransition.asymmetric(
