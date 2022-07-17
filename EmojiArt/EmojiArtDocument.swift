@@ -84,29 +84,19 @@ class EmojiArtDocument: ObservableObject {
         backgroundImage = nil
         switch emojiArt.background {
         case .url(let url):
-            private func fetchBackgroundImageDataIfNecessary() {
-                backgroundImage = nil
-                switch emojiArt.background {
-                case .url(let url):
-                    backgroundImageFetchStatus = .fetching
-                    backgroundImageFetchCancellable?.cancel()
-                    let session = URLSession.shared
-                    let publisher = session.dataTaskPublisher(for: url)
-                        .map { (data, urlResponse) in UIImage(data: data) }
-                        .replaceError(with: nil)
-                        .receive(on: DispatchQueue.main)
+            backgroundImageFetchStatus = .fetching
+            backgroundImageFetchCancellable?.cancel()
+            let session = URLSession.shared
+            let publisher = session.dataTaskPublisher(for: url)
+                .map { (data, urlResponse) in UIImage(data: data) }
+                .replaceError(with: nil)
+                .receive(on: DispatchQueue.main)
 
-                    backgroundImageFetchCancellable = publisher
-                        .sink { [weak self] image in
-                            self?.backgroundImage = image
-                            self?.backgroundImageFetchStatus = (image != nil) ? .idle : .failed(url)
-                        }
-                case .imageData(let data):
-                    backgroundImage = UIImage(data: data)
-                case .blank:
-                    break
+            backgroundImageFetchCancellable = publisher
+                .sink { [weak self] image in
+                    self?.backgroundImage = image
+                    self?.backgroundImageFetchStatus = (image != nil) ? .idle : .failed(url)
                 }
-            }
 //            DispatchQueue.global(qos: .userInitiated).async {
 //                if let imageData = try? Data(contentsOf: url) {
 //                    DispatchQueue.main.async { [weak self] in
