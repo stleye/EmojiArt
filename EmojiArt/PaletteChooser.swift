@@ -13,7 +13,8 @@ struct PaletteChooser: View {
 
     @EnvironmentObject var store: PaletteStore
     
-    @State private var chosePaletteIndex = 0
+    @SceneStorage("PaletteChooser.chosenPaletteIndex")
+    private var chosePaletteIndex = 0
 
     var body: some View {
         HStack {
